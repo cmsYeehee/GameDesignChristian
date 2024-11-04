@@ -32,13 +32,11 @@ Gameplay Mechanics
 For each mission, you can deploy a combination of ships based on level nature and funding.
 
 You get a starting screen, and the deploy zone comes up highlighted in gray, with tiles that you can place the ships on. An example is shown in the pdf file. 
-
-## how does the user choose the ships and what does it actually look like deployed in game
+The deployment zone image is given in the pdf file.
 
 Vehicles unlock at different levels, and during battle, you can swap between vehicles to manually control each one.
 AI controls other vehicles and the ones you haven't unlocked.
-
-## what is the movement like, how does it all look while playing, there is currently no way of knowing how the game is meant to look while actually playing or anything like that
+The gameplay is shown in the pdf file
 
 Objectives
 Offensive goals: Destruction, time-based objectives, and least fuel usage.
