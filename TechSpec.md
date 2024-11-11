@@ -21,9 +21,7 @@ map: Map - The game map instance.
 selectedVehicle: Vehicle - The vehicle currently under player's control.
 allVehicles: List<Vehicle> - List of all vehicles.
 deploymentZone: Zone - Area where the player can deploy vehicles.
-## will have to make a class for this
 defenseBuildings: list<DefensiveStructure> - A list of the defensive structures. Defense structure [0] is the capital core.
-## implement the townhall style feature
 gameTime: float - Timer for level objectives.
 isPaused: boolean - Game pause state.
 Methods
@@ -59,11 +57,9 @@ Represents the game environment, including terrain, buildings, and defensive str
 Variables
 
 terrainGrid: 2D Array<TerrainTile> - Represents the terrain layout. Some of the 2D array should be "walkable" by land. Some of it should be nonwalkable by land.
-## would we not need a class for terrtainTile?
 buildings: List<Building> - List of all buildings on the map.
 defensiveStructures: List<DefensiveStructure> - Turrets, air defenses, and capital cores.
 spawnPoints: List<Point> - Locations where enemy units spawn.
-## don't we need a point class then?
 deployZone: Zone - Area where the player can deploy vehicles.
 Methods
 
@@ -268,55 +264,15 @@ upgradeType: enum { Offensive, Defensive, Utility }
 effect: UpgradeEffect
 Methods
 
-15. UserInterface
-Manages all UI elements, including HUD, menus, and in-game notifications.
 
-Variables
-
-hud: HUD - Displays health, energy, and selected vehicle info.
-mainMenu: Menu
-settingsMenu: Menu
-scoreScreen: Screen
-Methods
-
-- updateHUD()
-Behavior: Refreshes HUD elements based on game state.
-- showMenu(Menu menu)
-Behavior: Displays the specified menu.
-- displayNotification(String message)
-Behavior: Shows in-game messages to the player.
-16. SoundManager
-Handles all audio in the game.
-
-Variables
-
-backgroundMusic: AudioTrack
-soundEffects: Dictionary<String, AudioClip>
-Methods
-
-- playMusic(String trackName)
-Behavior: Starts playing background music.
-- playSoundEffect(String effectName)
-Behavior: Plays a sound effect.
-- stopMusic()
-Behavior: Stops the background music.
-17. InputManager
-Processes player input and sends commands to the GameManager.
-
-Methods
-- processInput()
-Behavior: Reads input devices and triggers corresponding actions.
-- bindKey(String action, KeyCode key)
-Behavior: Allows customization of key bindings.
-
-18. Team (Enum)
+15. Team (Enum)
 Defines the team affiliations.
 
 Values:
 Player
 Enemy
 
-20. Point
+16. Point
 Represents a coordinate in 2D space.
 
 Variables
@@ -331,7 +287,7 @@ Behavior: Calculates the Euclidean distance to another point.
 Behavior: Returns a new Point by adding a Vector to the current point.
 - equals(Point other): boolean
 Behavior: Checks if two points have the same coordinates.
-21. Vector
+17. Vector
 Represents a direction and magnitude in 2D space.
 
 Variables
@@ -347,7 +303,7 @@ Behavior: Returns a unit vector (vector of length 1) in the same direction.
 - scale(float scalar): Vector
 Input: scalar - The factor by which to scale the vector.
 Behavior: Returns a new Vector scaled by the given factor.
-22. Zone
+18. Zone
 Defines a rectangular area on the map, such as the deployment zone.
 
 Variables
@@ -360,7 +316,7 @@ Methods
 Behavior: Determines if a given point lies within the zone.
 - getAllPoints(): List<Point>
 Behavior: Returns a list of all points within the zone (useful for certain calculations).
-23. TerrainType (Enum)
+19. TerrainType (Enum)
 Categorizes different types of terrain on the map.
 
 Values
@@ -371,7 +327,7 @@ ROAD - Terrain that may provide speed bonuses to ground vehicles.
 BUILDING - Occupied space by buildings; impassable until destroyed.
 DEPLOYMENT_ZONE - Area where players can deploy vehicles.
 UNWALKABLE - General impassable terrain.
-24. TerrainTile
+20. TerrainTile
 Represents an individual tile in the terrain grid.
 
 Variables
