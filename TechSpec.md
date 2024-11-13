@@ -1,10 +1,14 @@
-## Game engine:
+## Figma:
+https://www.figma.com/board/uUgNTid7ZpNtmKXOgjB9Jq/TechSpec?node-id=0-1&t=XBqbuxl4W0JYjZDq-1
+
+## Game engine: Phaser
 MelonJS: No youtube videos! Simple, but there's just not enough information on this online
 
 BabylonJS: While it does have 3d features, it looks way too difficult to actually be able to find anything.
 
 Phaser: Seems like it can do 2.5d. It looks simple to use, and has various examples on it's website of how to use it. There are a bunch of youtube videos on it, and they wouldn't take too long to understand these videos to start coding. 
 
+CraftyJS: While it does seem to work for our type of games, it lacks some of the features and capabilities of Phaser.
 ## Architecture: 
 1. GameManager
 Manages the overall game state, including level progression, score, and player interactions.
@@ -66,9 +70,9 @@ Behavior: Loads terrain, buildings, and defensive structures for the specified l
 - isPassable(Point position, Vehicle vehicle)
 Output: boolean - Returns true if the vehicle type can pass through the position.
 - destroyBuilding(Building building)
-Behavior: "Destroys" a building from the map, meaning it can now be walked over by vehicles and updates terrainTile at that point.
+Behavior: "Destroys" a building from the map, meaning it can now be walked over by vehicles and updates isPassable at that zone.
 - destroyDefensiveStructure(DefensiveStructure structure)
-Behavior: "Destroys" a defensive structure from the map, meaning it can now be walked over by vehicles and updates terrainTile at that point.
+Behavior: "Destroys" a defensive structure from the map, meaning it can now be walked over by vehicles and updates isPassable at that zone.
 - getNearestEnemy(Point position)
 Output: Defensive structure - Returns the nearest enemy object to the given position.
 - getNearestBuilding(Point position)
@@ -260,3 +264,6 @@ Methods:
 move(float deltaTime) Behavior: Moves the projectile forward from currentPosition to endPosition. 
 checkCollision()
  Behavior: Checks for when projectile hits endPosition.
+
+
+ 
