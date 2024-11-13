@@ -59,6 +59,7 @@ An example of the bottom bar, gameplay, and terrain would be playing above it.
 
 The camera follows air vehicle from a top-down perspective
 Upgrades and Progression
+## add total score to your coins where you buy upgrades
 Score-Based Unlocks: Players earn points from destroyed enemies, which can be used to unlock new units or upgrade existing ones.
 Skill Tree System:
 Offensive Upgrades: Improve weapon strength, rate of fire, and explosion radius.
@@ -66,7 +67,6 @@ Defensive Upgrades: Increase health and armor, upgrade shield durability, enhanc
 Utility Upgrades: Boost vehicle speed, fuel efficiency, and power redistribution effectiveness.
 
 Score System
-Based on score, you get levels up to unlock other vehicles.
 Objective: 100% destruction to win in 10 minutes.
 Defense Mechanics
 Turrets/Defenses: 250 health
@@ -91,4 +91,7 @@ Sound design
 Ambient sounds always playing in background
 Shocky laser sound when buildings/vehicles hit
 Engine noises in background during gameplay
+## each level already set out
+## concentrations of defense buildings, bigger maps, higher health
+## just have to destroy main tower.
 
