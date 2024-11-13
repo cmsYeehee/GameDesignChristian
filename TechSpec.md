@@ -20,8 +20,9 @@ aiVehicles: List<Vehicle>  - List of AI-controlled vehicles (friendly). All vehi
 map: Map - The game map instance.
 selectedVehicle: Vehicle - The vehicle currently under player's control.
 allVehicles: List<Vehicle> - List of all vehicles.
-deploymentZone: Zone - Area where the player can deploy vehicles.
+deploymentZoness: list<Zone> - Area where the player can deploy vehicles.
 defenseBuildings: list<DefensiveStructure> - A list of the defensive structures. Defense structure [0] is the capital core.
+buildings: list<buildings> - A list of all the non-defensive building structures
 gameTime: float - Timer for level objectives.
 isPaused: boolean - Game pause state.
 Methods
@@ -41,14 +42,12 @@ Behavior: Places a vehicle in the deployment zone at the specified position.
 Behavior: Changes selectedVehicle to the vehicle with the given ID.
 - togglePause()
 Behavior: Toggles the game's paused state.
-- changeAIBehavior(String AIPlayStyle, Vehicle vehicle)  
+- changeAIBehavior(Vehicle vehicle)  
 Behavior: Change the playstyle of a specific vehicle (ground or air); More information on what the play styles are in the Vehicle abstract class.
-- tickGamePlay(float deltaTime)
-Behavior: Updates game logic, including vehicle movements and AI behaviors.
-- handleInput(InputEvent event)
-Behavior: Processes player input and directs it to the appropriate vehicle or game component.
 - checkGameOver()
 Output: boolean - If true, and allVehicles health are = 0, end game. initializeGame() to allow user to restart level.
+- upgradeVehicle (Vehicle vehicle)
+Behvaior: Upgrades a type of vehicle for a specific trait. Depends on the upgradeSystem class.
 
 
 2. Map
@@ -56,24 +55,25 @@ Represents the game environment, including terrain, buildings, and defensive str
 
 Variables
 
-terrainGrid: 2D Array<TerrainTile> - Represents the terrain layout. Some of the 2D array should be "walkable" by land. Some of it should be nonwalkable by land.
+terrainGrid: 2D Array<Point> - Represents the terrain layout. Some of the 2D array should be "walkable" by land. Some of it should be nonwalkable by land.
 buildings: List<Building> - List of all buildings on the map.
-defensiveStructures: List<DefensiveStructure> - Turrets, air defenses, and capital cores.
-spawnPoints: List<Point> - Locations where enemy units spawn.
-deployZone: Zone - Area where the player can deploy vehicles.
+defensiveStructures: List<DefensiveStructure> - Turrets, air defenses, and capital cores. defensiveStructure[0] is the capital core
+deployZones: List<Zone> - Area where the player can deploy vehicles.
 Methods
 
 - loadMap(int levelNumber)
 Behavior: Loads terrain, buildings, and defensive structures for the specified level.
-- isPassable(Point position, VehicleType type)
+- isPassable(Point position, Vehicle vehicle)
 Output: boolean - Returns true if the vehicle type can pass through the position.
 - destroyBuilding(Building building)
-Behavior: "Destroys" a building from the map, meaning it can now be walked over by vehicles and updates the game state and method isPassable at that point.
+Behavior: "Destroys" a building from the map, meaning it can now be walked over by vehicles and updates terrainTile at that point.
+- destroyDefensiveStructure(DefensiveStructure structure)
+Behavior: "Destroys" a defensive structure from the map, meaning it can now be walked over by vehicles and updates terrainTile at that point.
 - getNearestEnemy(Point position)
 Output: Defensive structure - Returns the nearest enemy object to the given position.
 - getNearestBuilding(Point position)
 Output: Nearest Building; Returns the nearest enemy building to the given position. 
-- getPathToCapital(Point position, capitcalCore core)
+- getPathToCapital(Point position)
 Output: 2D array providng directions to capital core in ground vehicle. Will have to use stack/queue to ensure that it is the quickest path to the capital.
 - getPathToUser(Point postion)
 Output: 2D array providng directions to user in ground vehicle. Will have to use stack/queue to ensure that it is the quickest path to the capital.
@@ -87,109 +87,67 @@ id: int - Unique identifier for the vehicle.
 position: Point - Current position.
 direction: Vector - Current movement direction.
 health: float - Current health points.
-maxHealth: float - Maximum health points.
 living: boolean - determines if vehicle still has health or not
 speed: float - Movement speed.
 isSelected: boolean - If the vehicle is currently under player control.
 energy: float - Current energy level for weapons and shields.
-maxEnergy: float - Maximum energy capacity.
 energyForShield: float - Currently energy allocated for shields
 energyForWeapons: float - currently energy allocated for weapons.
-weapon: Weapon - The equipped weapon.
-shield: Shield - Shield component.
-type: String - type of vehicle (air or ground)
-AIplayStyle - "String": User will choose a playstyle for ground/air vehicles. Options: 
+AIplayStyle - enum: User will choose a playstyle for ground/air vehicles. Options: 
  - "Aggressive" - move straight to the capital core to try and destroy it. 
  - "Destructive" - move to nearest building to destroy it.
  - "Offensive" - move to nearest defense tower to destroy it.
  - "Follower" - follow the user controlled 
+ damage: float - Damage per shot.
+fireRate: float - Shots per second.
+range: float - Maximum effective range.
+energyCost: float - Energy consumed per shot.
+vehicleType: enum - ground Vehicle or air vehicle
 
 Methods
 
 - move(Vector direction, float deltaTime)
-Behavior: Moves the vehicle in the specified direction, considering speed and collisions. Has to call isPassable class to determine if the vehicle can continue to move in a direction.
-- canAttack (energyCost)
-Behavior: Returns true is energyCost < energyForWeapons. Returns false otherwise.
+Behavior: Moves the vehicle in the specified direction, considering speed and collisions. Has to call isPassable method and determine the type of vehicle to determine if the vehicle can continue to move in a direction. Only works if isSelected is true. 
+- canAttack (Point postion)
+Behavior: Returns true is energyCost < energyForWeapons and if the building is within range. Returns false otherwise.
 - attack(Vector direction)
 Behavior: Fires the weapon in the current direction. Reduce energyForWeapons by energyCost amount. 
 - selfDestruct()
 Behavior: Causes the vehicle to explode, dealing area damage. Calls the destructiveVehicles class and buildings class to damage their buildings accordingly.
 - redistributePower(float energyForShield, float energyForWeapons)
-Behavior: Allocates energy between weapons and shields. I
+Behavior: Allocates energy between weapons and shields. 
 - takeDamage(float amount)
 Behavior: Reduces health by the damage amount after shield mitigation. If only shield takes damage, only reduce shield health.
-- update(float deltaTime)
-Behavior: Updates the vehicle's state each frame.
 - remove()
 Behavior: If living is false, remove the vehicle from map.
 
 
 
-4. GroundVehicle (Inherits Vehicle)
-Represents ground-based vehicles.
-
-
-
-Methods
-
-playerMove(Vector direction, float deltaTime, boolean isSelected)
-- Behavior: Overrides base move to include terrain modifiers. If the isSelected is false, will call the AIMove method in AIGroundVehicle
-
-5. AirVehicle (Inherits Vehicle)
-
-Methods
-
-playerMove(Vector direction, float deltaTime, boolean isSelected)
-- Behavior: Overrides base move to include terrain modifiers. If the isSelected is false, will call the AIMove method in AIAirVehicle
-
-
-6. AIGroundVehicle (Inherits Vehicle)
+4. AIVehicle (Inherits Vehicle)
 Represents AI ground-based vehicles
 variables:
-AIplayStyle - "String": User will choose a playstyle for ground/air vehicles. Options: 
- - "Aggressive" - move straight to the capital core to try and destroy it. 
- - "Destructive" - move to nearest building to destroy it.
- - "Offensive" - move to nearest defense tower to destroy it.
- - "Follower" - follow the user controlled 
+target: Point - The target for the AI vehicle;
 
 Methods:
-- AIMove(Vector direction, float deltaTime, boolean isSelected)
-Behavior: Has to call the AIplayStyle method. If Aggressive, call getPathToCapital. If destructive, call getNearestBuilding. If Offensive call getNearestenemy. If follower, follow movement of user. If they are in an air vehicle and user isn't, call: getPathToUser. 
+- findTarget()
+Behavior: finds the next target based on the AIplayStyle variable. Returns a target point.
+AIMoveAndAttack(Vector direction, float deltaTime)
+Behavior: Has to call the AIplayStyle method. If Aggressive, call getPathToCapital. findTarget() should also produce the capital point, and the AI bot will attack once in range. If destructive, call getNearestBuilding. findTarget() should also produce the nearest building, and the AI bot will attack once in range. If Offensive call getNearestenemy. findTarget() should also produce the nearest defensive structure, and the AI bot will attack once in range. If follower, follow movement of user. If they are in an air vehicle and user isn't, call: getPathToUser. Once user has stopped for >= 1 second, find where user is attacking and attack the same building. 
 
-7. AIAirVehicle (Inherits Vehicle)
-AIplayStyle - "String": User will choose a playstyle for ground/air vehicles. Options: 
- - "Aggressive" - move straight to the capital core to try and destroy it. 
- - "Destructive" - move to nearest building to destroy it.
- - "Offensive" - move to nearest defense tower to destroy it.
- - "Follower" - follow the user controlled 
-
-Methods:
-- AIMove(Vector direction, float deltaTime, boolean isSelected)
-Behavior: Has to call the AIplayStyle method. If Aggressive, call getPathToCapital. If destructive, call getNearestBuilding. If Offensive call getNearestenemy. If follower, follow movement of user. If they are in an air vehicle and user isn't, call: getPathToUser. 
-8. Weapon
-Represents weapons equipped by vehicles.
-
-Variables
-
-damage: float - Damage per shot.
-fireRate: float - Shots per second.
-range: float - Maximum effective range.
-energyCost: float - Energy consumed per shot.
-projectileType: Projectile - Type of projectile fired.
-
-
-
-9. DefensiveStructure
+5. DefensiveStructure
 Represents defensive buildings like turrets and air defenses.
 
 Variables
 
 position: Point - Location on the map.
 health: float - Current health points.
-weapon: Weapon - Equipped weapon.
 targetingRange: float - Detection range for enemies.
 isActive: boolean - Indicates if the structure is operational.
+ damage: float - Damage per shot.
+fireRate: float - Shots per second.
 Methods
+
+
 
 scanForTargets()
 Output: boolean - determine whether or not there is a target in range
@@ -198,46 +156,21 @@ attackTarget()
 Behavior: Fires at the closest target within range. 
 takeDamage(float amount)
 Behavior: Reduces health and checks for destruction.
-10. Building
+6. Building
 Represents non-defensive structures that can be destroyed.
 
 Variables
 
-position: Point
-health: float
-isDestroyed: boolean
+position: Point - location on map
+health: float - current health points
+isDestroyed: boolean - indicates if structure is destroyed
 Methods
 
 takeDamage(float amount)
 Behavior: Reduces health and sets isDestroyed if health drops to zero.
-11. CapitalCore (Inherits DefensiveStructure)
-Represents the main objective with stronger defenses.
-
-Variables
-
-shield: Shield - Enhanced shielding.
-Methods
 
 
-takeDamage(float amount)
-Behavior: Reduces health and checks for destruction.
-12. Projectile
-Represents projectiles fired by weapons.
-
-Variables
-
-position: Point
-direction: Vector
-speed: float
-damage: float
-originTeam: Team
-Methods
-
-move(float deltaTime)
-Behavior: Moves the projectile forward.
-checkCollision()
-Behavior: Checks for collisions with vehicles or structures, and checks if collision is with the other team.
-13. UpgradeSystem
+7. UpgradeSystem
 Handles vehicle upgrades and progression.
 
 Variables
@@ -249,36 +182,29 @@ Methods
 - purchaseUpgrade(Upgrade upgrade)
 Behavior: Buys an upgrade if the player has enough coins. 
 - applyUpgrade(Vehicle vehicle, Upgrade upgrade)
-Behavior: Applies the upgrade effects to the specified vehicle. Will update a variable in the vehicle class like rate of fire, shield cost, etc. (listed in revisedDesign.md). 
+Behavior: Applies the upgrade effects to the specified vehicle. Will update a variable in the vehicle class like rate of fire, shield cost, etc. (listed in revisedDesign.md) based on the upgradeType
 getAvailableUpgrades()
-Output: List<Upgrade> - Returns a list of upgrades that can be purchased.
-14. Upgrade
+Output: List<Upgrade> - Returns a list of upgrades that can be purchased taking into account the cost of the upgrades.
+8. Upgrade
 Represents an individual upgrade.
 
 Variables
 
-name: String
-description: String
-cost: int
-upgradeType: enum { Offensive, Defensive, Utility }
-effect: UpgradeEffect
+name: String - name of upgrade
+description: String - description of upgrade
+cost: int - cost of upgrade
+upgradeType: enum { Offensive, Defensive, Utility } - type of upgrade(check what each upgrade does in the revisedDesign.md. Depending on which option they select, they will get a small boost to those factors)
 Methods
 
 
-15. Team (Enum)
-Defines the team affiliations.
-
-Values:
-Player
-Enemy
-
-16. Point
+9. Point
 Represents a coordinate in 2D space.
 
 Variables
 
 x: float - The X-coordinate.
 y: float - The Y-coordinate.
+isPassable: boolean. Is the point passable by a ground vehicle?
 Methods
 
 - distanceTo(Point other): float
@@ -287,59 +213,50 @@ Behavior: Calculates the Euclidean distance to another point.
 Behavior: Returns a new Point by adding a Vector to the current point.
 - equals(Point other): boolean
 Behavior: Checks if two points have the same coordinates.
-17. Vector
+
+10. Vector
 Represents a direction and magnitude in 2D space.
 
 Variables
 
 dx: float - Change in the X-coordinate.
 dy: float - Change in the Y-coordinate.
+
 Methods
 
 - magnitude(): float
 Behavior: Calculates the magnitude (length) of the vector.
-- normalize(): Vector
-Behavior: Returns a unit vector (vector of length 1) in the same direction.
 - scale(float scalar): Vector
 Input: scalar - The factor by which to scale the vector.
 Behavior: Returns a new Vector scaled by the given factor.
-18. Zone
+
+
+11. Zone
 Defines a rectangular area on the map, such as the deployment zone.
 
 Variables
 
 topLeft: Point - The top-left corner of the zone.
 bottomRight: Point - The bottom-right corner of the zone.
+isPassable: boolean. Zone is passable if true by a ground vehicle. Always passable by air vehicle.
 Methods
 
 - contains(Point point): boolean
 Behavior: Determines if a given point lies within the zone.
 - getAllPoints(): List<Point>
 Behavior: Returns a list of all points within the zone (useful for certain calculations).
-19. TerrainType (Enum)
-Categorizes different types of terrain on the map.
+- determineIfPassable(): determine if all points in a zone are passable. If true, set isPassable to true. 
 
-Values
-GRASS - Standard terrain, passable by ground vehicles.
-WATER - Impassable terrain for ground vehicles.
-MOUNTAIN - Impassable terrain.
-ROAD - Terrain that may provide speed bonuses to ground vehicles.
-BUILDING - Occupied space by buildings; impassable until destroyed.
-DEPLOYMENT_ZONE - Area where players can deploy vehicles.
-UNWALKABLE - General impassable terrain.
-20. TerrainTile
-Represents an individual tile in the terrain grid.
 
-Variables
+12. Projectile
+Projectile Represents projectiles fired by weapons.
 
-type: TerrainType - The type of terrain for this tile.
-isPassable: boolean - Indicates if the tile can be traversed by ground vehicles.
-Methods
+Variables:
+currentPosition: Point - where the projectile is coming from 
+endPosition: Point - where the projectile is going to
 
-- determinePassability(Vehicle vehicle): boolean
-Input: vehicle - Within the vehicle you would need to know the type of vehicle, so is it a ground or an air vehicle. this will change which variables can cross the path. 
-Behavior: Determines if the tile is passable by the given vehicle type.
-- setTerrainType(TerrainType newType)
-Behavior: Changes the terrain type of the tile and updates isPassable accordingly.
-- getTerrainEffects(Vehicle vehicle): TerrainEffects
-Behavior: Returns any effects the terrain has on the vehicle (e.g., speed modifiers).
+Methods:
+
+move(float deltaTime) Behavior: Moves the projectile forward from currentPosition to endPosition. 
+checkCollision()
+ Behavior: Checks for when projectile hits endPosition.
